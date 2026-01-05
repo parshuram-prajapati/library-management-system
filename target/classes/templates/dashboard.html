@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <title>Library App Dashboard</title>
+</head>
+
+<body>
+<div class="d-flex w-100 h-100 bg-light-gray">
+
+  <!-- Sidebar -->
+  <aside th:replace="~{layout :: sidebar(page='dashboard')}"></aside>
+
+  <!-- Main Content -->
+  <main class="flex-grow-1 main-content-wrapper overflow-auto">
+
+    <!-- Header -->
+    <header class="p-3 bg-light-gray sticky-top border-bottom">
+      <div class="container-fluid d-flex justify-content-end align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <img src="https://ui-avatars.com/api/?name=Admin" class="rounded-circle" width="32">
+          <span class="fw-semibold">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-fluid px-4 pb-5">
+
+      <!-- STATS ROW 1 -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Borrowed Books</small>
+            <h3 id="borrowedCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Returned Books</small>
+            <h3 id="returnedCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Overdue Books</small>
+            <h3 id="overdueCount">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS ROW 2 -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Total Books</small>
+            <h3 id="totalBooksCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Total Members</small>
+            <h3 id="membersCount">0</h3>
+          </div>
+        </div>
+
+        <!-- ✅ NEW CARD: TOTAL FINE -->
+        <div class="col-md-4">
+          <div class="card p-3 border-danger">
+            <small>Total Fine (₹)</small>
+            <h3 id="totalFine" class="text-danger">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART + OVERDUE TABLE -->
+      <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+          <div class="card p-4">
+            <h6 class="mb-3">Activity Overview</h6>
+            <div style="height:260px">
+              <canvas id="checkoutChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card p-4">
+            <h6 class="mb-3">Overdue Books</h6>
+            <table class="table mb-0">
+              <tbody id="overdueTableBody">
+                <tr>
+                  <td class="text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="card p-4">
+        <h6 class="mb-3">Recent Check-outs</h6>
+        <table class="table mb-0">
+          <tbody id="recentActivityTableBody">
+            <tr>
+              <td class="text-muted">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/dashboard.js"></script>
+
+<!-- UI polish -->
+<style>
+  .card {
+    border-radius: 14px;
+  }
+  h6 {
+    font-weight: 600;
+  }
+  body {
+    background-color: #f6f7fb;
+  }
+</style>
+
+</body>
+</html>
