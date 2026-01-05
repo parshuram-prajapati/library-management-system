@@ -15,18 +15,18 @@ public class FirebaseConfig {
     @PostConstruct
     public void initFirebase() {
         try {
-            String base64 = System.getenv("FIREBASE_CREDENTIALS_BASE64");
+            String base64Creds = System.getenv("FIREBASE_CREDENTIALS_BASE64");
 
-            if (base64 == null || base64.isEmpty()) {
-                throw new IllegalStateException("Firebase credentials not found");
+            if (base64Creds == null || base64Creds.isEmpty()) {
+                System.out.println("⚠️ Firebase Base64 credentials not found, skipping Firebase init");
+                return;
             }
 
-            byte[] decoded = Base64.getDecoder().decode(base64);
-
-            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(decoded));
+            byte[] decodedBytes = Base64.getDecoder().decode(base64Creds);
+            ByteArrayInputStream serviceAccount = new ByteArrayInputStream(decodedBytes);
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(credentials)
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
@@ -36,7 +36,7 @@ public class FirebaseConfig {
             System.out.println("🔥 Firebase initialized successfully (Base64)");
 
         } catch (Exception e) {
-            throw new RuntimeException("Firebase init failed", e);
+            System.out.println("❌ Firebase initialization failed: " + e.getMessage());
         }
     }
 }
