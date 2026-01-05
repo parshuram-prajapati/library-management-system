@@ -18,15 +18,16 @@ public class FirebaseConfig {
             String base64Creds = System.getenv("FIREBASE_CREDENTIALS_BASE64");
 
             if (base64Creds == null || base64Creds.isEmpty()) {
-                System.out.println("⚠️ Firebase Base64 credentials not found, skipping Firebase init");
+                System.out.println("❌ FIREBASE_CREDENTIALS_BASE64 not found");
                 return;
             }
 
-            byte[] decodedBytes = Base64.getDecoder().decode(base64Creds);
-            ByteArrayInputStream serviceAccount = new ByteArrayInputStream(decodedBytes);
+            byte[] decoded = Base64.getDecoder().decode(base64Creds);
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(
+                            GoogleCredentials.fromStream(
+                                    new ByteArrayInputStream(decoded)))
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
@@ -36,7 +37,7 @@ public class FirebaseConfig {
             System.out.println("🔥 Firebase initialized successfully (Base64)");
 
         } catch (Exception e) {
-            System.out.println("❌ Firebase initialization failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
