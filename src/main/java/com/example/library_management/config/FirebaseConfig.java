@@ -15,11 +15,16 @@ public class FirebaseConfig {
     @PostConstruct
     public void initFirebase() {
         try {
+            // Avoid double init
+            if (!FirebaseApp.getApps().isEmpty()) {
+                System.out.println("🔥 Firebase already initialized");
+                return;
+            }
+
             String base64Creds = System.getenv("FIREBASE_CREDENTIALS_BASE64");
 
-            if (base64Creds == null || base64Creds.isEmpty()) {
-                System.out.println("❌ FIREBASE_CREDENTIALS_BASE64 not found");
-                return;
+            if (base64Creds == null || base64Creds.isBlank()) {
+                throw new RuntimeException("❌ FIREBASE_CREDENTIALS_BASE64 not found");
             }
 
             byte[] decoded = Base64.getDecoder().decode(base64Creds);
@@ -30,13 +35,12 @@ public class FirebaseConfig {
                                     new ByteArrayInputStream(decoded)))
                     .build();
 
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-            }
+            FirebaseApp.initializeApp(options);
 
-            System.out.println("🔥 Firebase initialized successfully (Base64)");
+            System.out.println("🔥 Firebase initialized successfully");
 
         } catch (Exception e) {
+            System.err.println("❌ Firebase initialization failed");
             e.printStackTrace();
         }
     }

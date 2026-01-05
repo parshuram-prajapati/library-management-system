@@ -18,6 +18,12 @@ package com.example.library_management.model;
 public class Issue {
 
     /*
+     * Unique identifier for the issue record
+     * DSA: used as key when storing in Firestore (document id)
+     */
+    private String id;
+
+    /*
      * DSA:
      * bookId is used to SEARCH issues during return operation
      * Linear search is applied on Queue
@@ -71,6 +77,14 @@ public class Issue {
 
     public String getBookId() {
         return bookId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setBookId(String bookId) {

@@ -2,8 +2,10 @@ package com.example.library_management.controller;
 
 import com.example.library_management.model.*;
 import com.example.library_management.service.FirebaseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -18,55 +20,90 @@ public class LibraryController {
 
     // ---------- BOOKS ----------
     @GetMapping("/books")
-    public List<Book> getBooks() throws Exception {
-        return service.getAllBooks();
+    public ResponseEntity<List<Book>> getBooks() {
+        try {
+            return ResponseEntity.ok(service.getAllBooks());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(Collections.emptyList());
+        }
     }
 
     @PostMapping("/books")
-    public String addBook(@ModelAttribute Book book) throws Exception {
-        return service.addBook(book);
+    public ResponseEntity<String> addBook(@ModelAttribute Book book) {
+        try {
+            return ResponseEntity.ok(service.addBook(book));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Failed to add book");
+        }
     }
 
     @DeleteMapping("/books/{id}")
-    public String deleteBook(@PathVariable String id) {
-        return service.deleteBook(id);
+    public ResponseEntity<String> deleteBook(@PathVariable String id) {
+        return ResponseEntity.ok(service.deleteBook(id));
     }
 
     // ---------- STUDENTS ----------
     @GetMapping("/students")
-    public List<Student> getStudents() throws Exception {
-        return service.getAllStudents();
+    public ResponseEntity<List<Student>> getStudents() {
+        try {
+            return ResponseEntity.ok(service.getAllStudents());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(Collections.emptyList());
+        }
     }
 
     @PostMapping("/students")
-    public String addStudent(@ModelAttribute Student student) throws Exception {
-        return service.addStudent(student);
+    public ResponseEntity<String> addStudent(@ModelAttribute Student student) {
+        try {
+            return ResponseEntity.ok(service.addStudent(student));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Failed to add student");
+        }
     }
 
     @DeleteMapping("/students/{id}")
-    public String deleteStudent(@PathVariable String id) {
-        return service.deleteStudent(id);
+    public ResponseEntity<String> deleteStudent(@PathVariable String id) {
+        return ResponseEntity.ok(service.deleteStudent(id));
     }
 
     // ---------- ISSUE ----------
-    @PostMapping("/issue")
-    public String issue(@ModelAttribute Issue issue) throws Exception {
-        return service.issueBook(issue);
+    @GetMapping("/issues")
+    public ResponseEntity<List<Issue>> getIssues() {
+        try {
+            return ResponseEntity.ok(service.getAllIssues());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(Collections.emptyList());
+        }
     }
 
-    @GetMapping("/issues")
-    public List<Issue> getIssues() throws Exception {
-        return service.getAllIssues();
+    @PostMapping("/issue")
+    public ResponseEntity<String> issue(@ModelAttribute Issue issue) {
+        try {
+            return ResponseEntity.ok(service.issueBook(issue));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Issue failed");
+        }
     }
 
     @PostMapping("/return/{id}")
-    public String ret(@PathVariable String id) {
-        return service.returnBook(id);
+    public ResponseEntity<String> ret(@PathVariable String id) {
+        return ResponseEntity.ok(service.returnBook(id));
     }
 
     // ---------- SEED BOOKS ----------
     @GetMapping("/seed-books")
-    public String seedBooks() throws Exception {
-        return service.addBranchWiseBooks();
+    public ResponseEntity<String> seedBooks() {
+        try {
+            return ResponseEntity.ok(service.addBranchWiseBooks());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Seed failed");
+        }
     }
 }
