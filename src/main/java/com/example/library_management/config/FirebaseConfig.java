@@ -6,34 +6,37 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
 
     @PostConstruct
     public void initFirebase() {
-        InputStream serviceAccount = getClass().getClassLoader()
-                .getResourceAsStream("firebase-service-account.json");
-
-        if (serviceAccount == null) {
-            System.out.println("⚠️ Firebase service account not found on classpath, skipping Firebase initialization");
-            return;
-        }
-
         try {
+            String base64 = System.getenv("FIREBASE_CREDENTIALS_BASE64");
+
+            if (base64 == null || base64.isEmpty()) {
+                throw new IllegalStateException("Firebase credentials not found");
+            }
+
+            byte[] decoded = Base64.getDecoder().decode(base64);
+
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new ByteArrayInputStream(decoded));
+
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(credentials)
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
 
-            System.out.println("🔥 Firebase initialized successfully");
+            System.out.println("🔥 Firebase initialized successfully (Base64)");
 
         } catch (Exception e) {
-            System.out.println("⚠️ Failed to initialize Firebase: " + e.getMessage());
+            throw new RuntimeException("Firebase init failed", e);
         }
     }
 }
