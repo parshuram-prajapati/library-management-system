@@ -1,20 +1,22 @@
-# Use official Java 17 image
+# Use Java 17
 FROM eclipse-temurin:17-jdk
 
-# Set working directory
 WORKDIR /app
 
-# Copy project files
+# Copy project
 COPY . .
 
 # Make mvnw executable
 RUN chmod +x mvnw
 
-# Build the application
+# Build Spring Boot app
 RUN ./mvnw clean package -DskipTests
 
-# Expose Render port
+# Rename the jar to app.jar
+RUN mv target/*.jar app.jar
+
+# Expose port
 EXPOSE 8080
 
-# Run the Spring Boot app
-CMD ["java", "-jar", "target/*.jar"]
+# Run app
+CMD ["java", "-jar", "app.jar"]
