@@ -16,4 +16,9 @@ public class ReminderController {
     public String sendReminder(@PathVariable String bookId) {
         return reminderService.sendManualReminder(bookId);
     }
+
+    @PostMapping("/remind/{bookId}")
+    public String sendReminderPost(@PathVariable String bookId) {
+        return reminderService.sendManualReminder(bookId);
+    }
 }
