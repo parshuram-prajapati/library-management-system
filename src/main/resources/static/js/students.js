@@ -139,9 +139,15 @@ async function showMemberDetails(studentId) {
 
 /* ================= FINE ================= */
 function calculateFine(dueDate) {
-    const days =
-        Math.floor((new Date() - new Date(dueDate)) / (1000 * 60 * 60 * 24));
-    return days > 0 ? days * 2 : 0;
+    const today = new Date();
+    const due = new Date(dueDate);
+
+    const diffTime = today - due;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // Grace period: first 10 days after due date have no fine
+    if (diffDays <= 10) return 0;
+    return (diffDays - 10) * 2;
 }
 
 /* ================= CLOSE CARD ================= */

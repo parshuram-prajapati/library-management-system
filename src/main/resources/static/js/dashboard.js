@@ -48,7 +48,9 @@ function calculateFine(dueDate) {
     const diffTime = today - due;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    return diffDays > 0 ? diffDays * 2 : 0;
+    // Grace period: no fine for first 10 days after due date
+    if (diffDays <= 10) return 0;
+    return (diffDays - 10) * 2;
 }
 
 // ---------------- OVERDUE TABLE ----------------
