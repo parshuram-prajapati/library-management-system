@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <meta charset="utf-8">
+  <title>Check-out Books</title>
+</head>
+
+<!-- Page Specific Styles -->
+<style>
+  :root { --theme-green: #28c76f; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ===== PAGE ANIMATIONS ===== */
+  header {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  .container-fluid {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .row.g-4 > .col-lg-4 {
+    animation: slideInLeft 0.6s ease-out 0.1s both;
+  }
+
+  .row.g-4 > .col-lg-8 {
+    animation: slideInRight 0.6s ease-out 0.1s both;
+  }
+
+  /* ===== CARD ANIMATIONS ===== */
+  .card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-success {
+    background-color: var(--theme-green);
+    border-color: var(--theme-green);
+    transition: all 0.3s ease;
+    animation: scaleIn 0.5s ease-out 0.4s both;
+  }
+
+  .btn-success:hover {
+    background-color: #24b263;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(40, 199, 111, 0.3);
+  }
+
+  /* ===== FORM ANIMATIONS ===== */
+  .form-control {
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    border-color: var(--theme-green) !important;
+    transform: scale(1.01);
+  }
+
+  .form-label {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  /* ===== TABLE ANIMATIONS ===== */
+  .custom-table th {
+    font-weight: 600;
+    animation: slideInDown 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  .custom-table th:hover {
+    color: var(--theme-green);
+  }
+
+  .custom-table tbody tr {
+    animation: slideInUp 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  .custom-table tbody tr:nth-child(1) { animation-delay: 0s; }
+  .custom-table tbody tr:nth-child(2) { animation-delay: 0.05s; }
+  .custom-table tbody tr:nth-child(3) { animation-delay: 0.1s; }
+  .custom-table tbody tr:nth-child(4) { animation-delay: 0.15s; }
+  .custom-table tbody tr:nth-child(5) { animation-delay: 0.2s; }
+
+  .custom-table tbody tr:hover {
+    background: #f0f9ff;
+    transform: translateX(4px);
+  }
+
+  /* ===== HEADER ANIMATIONS ===== */
+  .bg-light-gray {
+    background-color: #f8f8f8;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  h5 {
+    animation: slideInDown 0.5s ease-out;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  h5:hover {
+    color: var(--theme-green);
+  }
+
+  .small {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  /* ===== BADGE ANIMATIONS ===== */
+  .badge {
+    animation: scaleIn 0.4s ease-out;
+  }
+
+  /* ===== SEARCH INPUT ===== */
+  #searchInput {
+    animation: slideInRight 0.5s ease-out 0.2s both;
+    transition: all 0.3s ease;
+  }
+
+  #searchInput:focus {
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    transform: scale(1.02);
+  }
+
+  /* ===== AVATAR ANIMATIONS ===== */
+  img.rounded-circle {
+    animation: slideInDown 0.5s ease-out;
+    transition: all 0.3s ease;
+  }
+
+  img.rounded-circle:hover {
+    transform: scale(1.1);
+  }
+</style>
+
+<body>
+<div class="d-flex w-100 h-100 bg-light-gray">
+
+  <!-- Sidebar -->
+  <aside th:replace="~{layout :: sidebar(page='issue')}"></aside>
+
+  <!-- Main Content -->
+  <main class="flex-grow-1 main-content-wrapper overflow-auto">
+
+    <!-- Header -->
+    <header class="p-3 bg-white border-bottom sticky-top">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <h5 class="m-0 fw-bold">Circulation Desk</h5>
+        <div class="d-flex align-items-center gap-2 bg-light px-3 py-2 rounded-pill shadow-sm">
+          <img src="https://ui-avatars.com/api/?name=AD&background=2563eb&color=fff"
+               class="rounded-circle" width="32">
+          <span class="small fw-semibold text-dark">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-fluid px-4 py-4">
+      <div class="row g-4">
+
+        <!-- LEFT: Issue Form -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm p-4 h-100 rounded-3">
+            <h5 class="fw-bold mb-4">Issue Book</h5>
+
+            <form id="issueBookForm">
+              <div class="mb-3">
+                <label class="form-label small text-muted fw-bold">STUDENT ID</label>
+                <input id="studentId" name="studentId"
+                       type="text"
+                       class="form-control bg-light border-0 py-2"
+                       required>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label small text-muted fw-bold">BOOK ID</label>
+                <input id="bookId" name="bookId"
+                       type="text"
+                       class="form-control bg-light border-0 py-2"
+                       required>
+              </div>
+
+              <button type="submit"
+                      class="btn btn-success w-100 py-2 fw-bold text-white shadow-sm">
+                Confirm Check-out
+              </button>
+
+              <div id="issueMsg"
+                   class="small mt-3 text-center text-muted"></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- RIGHT: Current Issues List -->
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm rounded-3 h-100">
+
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0
+                        d-flex justify-content-between align-items-center">
+              <h5 class="fw-bold m-0">Currently Issued</h5>
+
+              <input type="text"
+                     id="searchInput"
+                     class="form-control border-0 bg-light rounded-pill
+                            px-3 py-1 small"
+                     style="width: 200px;"
+                     placeholder="Search...">
+            </div>
+
+            <div class="card-body p-0 mt-3">
+              <div class="table-responsive">
+                <table class="table align-middle custom-table mb-0">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="ps-4">Book</th>
+                      <th>Student</th>
+                      <th>Due</th>
+                      <th class="text-end pe-4">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="issuedList">
+                    <tr>
+                      <td colspan="4"
+                          class="text-center py-5 text-muted">
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script th:replace="~{layout :: scripts}"></script>
+
+<!-- Bootstrap Icons (required for bell icon) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet">
+
+<!-- MAIN JS -->
+<script src="/js/issue.js"></script>
+
+</body>
+</html>

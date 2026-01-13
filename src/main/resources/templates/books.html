@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <meta charset="utf-8">
+  <title>Books Inventory</title>
+</head>
+
+<style>
+  :root { --theme-green: #28c76f; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ===== PAGE ANIMATIONS ===== */
+  header {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  .card {
+    animation: slideInUp 0.6s ease-out 0.1s both;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* ===== TABLE ANIMATIONS ===== */
+  .custom-table tbody tr {
+    animation: slideInUp 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  .custom-table tbody tr:nth-child(1) { animation-delay: 0s; }
+  .custom-table tbody tr:nth-child(2) { animation-delay: 0.05s; }
+  .custom-table tbody tr:nth-child(3) { animation-delay: 0.1s; }
+  .custom-table tbody tr:nth-child(4) { animation-delay: 0.15s; }
+  .custom-table tbody tr:nth-child(5) { animation-delay: 0.2s; }
+
+  .custom-table tr:hover td {
+    background-color: #fafafc;
+    color: var(--theme-green);
+    transform: translateX(4px);
+  }
+
+  .btn-success {
+    background-color: var(--theme-green);
+    border-color: var(--theme-green);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.6s ease-out 0.3s both;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(40, 199, 111, 0.3);
+  }
+
+  .badge-avail {
+    background-color: #dcf6e8;
+    color: #28c76f;
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .custom-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  .bg-light-gray { background-color: #f8f8f8; }
+
+  .container-fluid {
+    animation: fadeIn 0.8s ease-out;
+  }
+</style>
+
+<body>
+<div class="d-flex w-100 h-100 bg-light-gray">
+
+  <!-- SIDEBAR -->
+  <aside th:replace="~{layout :: sidebar(page='books')}"></aside>
+
+  <!-- MAIN -->
+  <main class="flex-grow-1 main-content-wrapper overflow-auto">
+
+    <!-- HEADER -->
+    <header class="p-3 bg-white border-bottom sticky-top">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+
+        <!-- ✅ SEARCH BAR -->
+        <div class="input-group bg-light rounded-pill" style="max-width: 350px;">
+          <span class="input-group-text bg-transparent border-0">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text"
+                 id="searchInput"
+                 class="form-control bg-transparent border-0"
+                 placeholder="Search by title, author or ID">
+        </div>
+
+        <button class="btn btn-success rounded-pill px-4"
+                data-bs-toggle="modal"
+                data-bs-target="#addBookModal">
+          + Add Book
+        </button>
+      </div>
+    </header>
+
+    <div class="container-fluid px-4 py-4">
+
+      <!-- BOOK TABLE -->
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle custom-table mb-0">
+              <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Book ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th class="text-end pe-4">Action</th>
+              </tr>
+              </thead>
+
+              <tbody id="booksGrid">
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">
+                  Loading books...
+                </td>
+              </tr>
+              </tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD BOOK MODAL -->
+<div class="modal fade" id="addBookModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Add New Book</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addBookForm">
+          <input name="id" class="form-control mb-2" placeholder="Book ID" required>
+          <input name="title" class="form-control mb-2" placeholder="Title" required>
+          <input name="author" class="form-control mb-3" placeholder="Author">
+          <button class="btn btn-success w-100">Add Book</button>
+          <div id="bookFormMsg" class="small text-center mt-2"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:replace="~{layout :: scripts}"></script>
+<script src="/js/books.js"></script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <title>Library App Dashboard</title>
+</head>
+
+<body>
+<div class="d-flex w-100 h-100 bg-light-gray">
+
+  <!-- Sidebar -->
+  <aside th:replace="~{layout :: sidebar(page='dashboard')}"></aside>
+
+  <!-- Main Content -->
+  <main class="flex-grow-1 main-content-wrapper overflow-auto">
+
+    <!-- Header -->
+    <header class="p-3 bg-light-gray sticky-top border-bottom">
+      <div class="container-fluid d-flex justify-content-end align-items-center">
+        <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm">
+          <img src="https://ui-avatars.com/api/?name=AD&background=2563eb&color=fff" class="rounded-circle" width="32">
+          <span class="fw-semibold text-dark">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-fluid px-4 pb-5">
+
+      <!-- STATS ROW 1 -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Borrowed Books</small>
+            <h3 id="borrowedCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Returned Books</small>
+            <h3 id="returnedCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Overdue Books</small>
+            <h3 id="overdueCount">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS ROW 2 -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Total Books</small>
+            <h3 id="totalBooksCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <small>Total Members</small>
+            <h3 id="membersCount">0</h3>
+          </div>
+        </div>
+
+        <!-- ✅ NEW CARD: TOTAL FINE -->
+        <div class="col-md-4">
+          <div class="card p-3 border-danger">
+            <small>Total Fine (₹)</small>
+            <h3 id="totalFine" class="text-danger">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART + OVERDUE TABLE -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <div class="card chart-card p-0 overflow-hidden">
+            <div class="card-header-custom bg-white p-4 border-bottom-subtle">
+              <div>
+                <h6 class="mb-1 fw-700">Book Circulation</h6>
+                <p class="text-muted small mb-0">Issued vs Returned Books Analysis</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <div class="chart-container">
+                <canvas id="checkoutChart"></canvas>
+              </div>
+              <div class="chart-legend-custom mt-4">
+                <div class="legend-item">
+                  <div class="legend-color issued"></div>
+                  <div class="legend-text">
+                    <span class="legend-label">Issued Books</span>
+                    <span class="legend-value" id="issuedPercent">0%</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color returned"></div>
+                  <div class="legend-text">
+                    <span class="legend-label">Returned Books</span>
+                    <span class="legend-value" id="returnedPercent">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card p-4">
+            <h6 class="mb-3 fw-700">Overdue Books</h6>
+            <table class="table mb-0">
+              <tbody id="overdueTableBody">
+                <tr>
+                  <td class="text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="card p-4">
+        <h6 class="mb-3">Recent Check-outs</h6>
+        <table class="table mb-0">
+          <tbody id="recentActivityTableBody">
+            <tr>
+              <td class="text-muted">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/dashboard.js"></script>
+
+<!-- UI polish & animations -->
+<style>
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    50% {
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+  }
+
+  /* ===== CARD STYLES ===== */
+  .card {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* ===== STAT CARDS SPECIFIC ===== */
+  .row.g-3.mb-3 .card,
+  .row.g-3.mb-4 .card {
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .row.g-3.mb-3 .col-md-4:nth-child(1) .card {
+    animation-delay: 0.1s;
+  }
+
+  .row.g-3.mb-3 .col-md-4:nth-child(2) .card {
+    animation-delay: 0.2s;
+  }
+
+  .row.g-3.mb-3 .col-md-4:nth-child(3) .card {
+    animation-delay: 0.3s;
+  }
+
+  .row.g-3.mb-4 .col-md-4:nth-child(1) .card {
+    animation-delay: 0.4s;
+  }
+
+  .row.g-3.mb-4 .col-md-4:nth-child(2) .card {
+    animation-delay: 0.5s;
+  }
+
+  .row.g-3.mb-4 .col-md-4:nth-child(3) .card {
+    animation-delay: 0.6s;
+  }
+
+  /* ===== HEADER ANIMATION ===== */
+  header {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  /* ===== NUMBER COUNTER ANIMATION ===== */
+  h3 {
+    font-weight: 700;
+    color: #1e40af;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover h3 {
+    color: #2563eb;
+    transform: scale(1.1);
+  }
+
+  .card small {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .card:hover small {
+    color: #374151;
+  }
+
+  /* ===== CHART CARD MODERN DESIGN ===== */
+  .row.g-4.mb-4 {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .row.g-4.mb-4 .col-lg-7 .chart-card {
+    animation-delay: 0.7s;
+  }
+
+  .row.g-4.mb-4 .col-lg-5 .card {
+    animation-delay: 0.8s;
+  }
+
+  .chart-card {
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    background: #ffffff;
+  }
+
+  .chart-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .card-header-custom {
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .border-bottom-subtle {
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.8s ease-out 1s both;
+  }
+
+  #checkoutChart {
+    max-height: 300px;
+  }
+
+  /* ===== LEGEND CUSTOM ===== */
+  .chart-legend-custom {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+    animation: slideInUp 0.6s ease-out 1.2s both;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .legend-color.issued {
+    background: linear-gradient(135deg, #28c76f 0%, #20a85a 100%);
+    box-shadow: 0 2px 8px rgba(40, 199, 111, 0.3);
+  }
+
+  .legend-color.returned {
+    background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+  }
+
+  .legend-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .legend-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    letter-spacing: 0.3px;
+  }
+
+  .legend-value {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  /* ===== TABLE ANIMATIONS ===== */
+  table tbody tr {
+    animation: slideInUp 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  table tbody tr:hover {
+    background-color: #f0f9ff;
+    transform: translateX(4px);
+  }
+
+  table tbody tr:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  table tbody tr:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  table tbody tr:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  /* ===== RECENT ACTIVITY CARD ===== */
+  .card:last-of-type {
+    animation: slideInUp 0.6s ease-out 0.9s both;
+  }
+
+  /* ===== CANVAS ANIMATION ===== */
+  canvas {
+    animation: fadeIn 1.2s ease-out;
+  }
+
+  /* ===== GENERAL STYLES ===== */
+  h6 {
+    font-weight: 700;
+    color: #1f2937;
+    transition: color 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .fw-700 {
+    font-weight: 700 !important;
+  }
+
+  body {
+    background-color: #f8f9fa;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  /* ===== ICON/AVATAR ANIMATION ===== */
+  img.rounded-circle {
+    animation: slideInDown 0.5s ease-out;
+    transition: all 0.3s ease;
+  }
+
+  img.rounded-circle:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  /* ===== CONTAINER ANIMATION ===== */
+  .container-fluid {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  /* ===== SMOOTH TRANSITIONS ===== */
+  * {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* ===== DANGER CARD (FINE) ===== */
+  .border-danger {
+    border: 2px solid #ef4444 !important;
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  .text-danger {
+    font-weight: 700;
+  }
+</style>
+
+</body>
+</html>

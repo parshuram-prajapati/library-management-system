@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <meta charset="utf-8">
+  <title>Members</title>
+</head>
+
+<style>
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ===== PAGE ANIMATIONS ===== */
+  header {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  .card {
+    animation: slideInUp 0.6s ease-out;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .card.mt-4 {
+    animation-delay: 0.2s;
+  }
+
+  /* ===== TABLE ANIMATIONS ===== */
+  .custom-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    animation: slideInDown 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  .custom-table th:hover {
+    color: #2563eb;
+  }
+
+  .custom-table tbody tr {
+    animation: slideInUp 0.5s ease-out;
+    transition: all 0.2s ease;
+  }
+
+  .custom-table tbody tr:nth-child(1) { animation-delay: 0s; }
+  .custom-table tbody tr:nth-child(2) { animation-delay: 0.05s; }
+  .custom-table tbody tr:nth-child(3) { animation-delay: 0.1s; }
+  .custom-table tbody tr:nth-child(4) { animation-delay: 0.15s; }
+  .custom-table tbody tr:nth-child(5) { animation-delay: 0.2s; }
+
+  .custom-table tr:hover {
+    background: #fafafc;
+    transform: translateX(4px);
+  }
+
+  /* ===== BUTTON ANIMATIONS ===== */
+  .btn-success {
+    animation: fadeIn 0.6s ease-out 0.3s both;
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(40, 199, 111, 0.3);
+  }
+
+  .btn-outline-secondary {
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-secondary:hover {
+    transform: scale(1.05);
+  }
+
+  /* ===== SEARCH INPUT ===== */
+  #searchInput {
+    animation: slideInDown 0.5s ease-out 0.2s both;
+    transition: all 0.3s ease;
+  }
+
+  #searchInput:focus {
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    transform: scale(1.02);
+  }
+
+  /* ===== CONTAINER ===== */
+  .container-fluid {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .d-flex {
+    animation: slideInDown 0.5s ease-out;
+  }
+
+  h5 {
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  h5:hover {
+    color: #2563eb;
+  }
+</style>
+
+<body>
+<div class="d-flex w-100 h-100 bg-light-gray">
+
+  <!-- SIDEBAR -->
+  <aside th:replace="~{layout :: sidebar(page='students')}"></aside>
+
+  <!-- MAIN -->
+  <main class="flex-grow-1 main-content-wrapper overflow-auto">
+
+    <!-- HEADER -->
+    <header class="p-3 bg-white border-bottom sticky-top">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Members</h5>
+
+        <div class="d-flex gap-2">
+          <input id="searchInput"
+                 type="text"
+                 class="form-control"
+                 placeholder="Search member..."
+                 style="width:200px">
+
+          <button class="btn btn-success"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addMemberModal">
+            + Add Member
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-fluid px-4 py-4">
+
+      <!-- MEMBERS TABLE -->
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle custom-table mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th onclick="sortBy('id')">
+                  Member ID <span id="sort-id">⇅</span>
+                </th>
+                <th onclick="sortBy('name')">
+                  Name <span id="sort-name">⇅</span>
+                </th>
+                <th onclick="sortBy('email')">
+                  Email <span id="sort-email">⇅</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <tr>
+                <td colspan="3" class="text-center text-muted py-4">
+                  Loading members...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= MEMBER DETAIL CARD ================= -->
+      <div class="card shadow-sm mt-4 d-none" id="memberDetailCard">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between mb-3">
+            <h5 class="fw-bold">Member Details</h5>
+            <button class="btn btn-sm btn-outline-secondary"
+                    onclick="closeMemberCard()">Close</button>
+          </div>
+
+          <!-- BASIC INFO -->
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <small class="text-muted">Name</small>
+              <div id="mdName" class="fw-semibold">-</div>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted">Member ID</small>
+              <div id="mdId" class="fw-semibold">-</div>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted">Email</small>
+              <div id="mdEmail" class="fw-semibold">-</div>
+            </div>
+          </div>
+
+          <!-- ISSUED BOOKS -->
+          <h6 class="fw-bold">Issued Books</h6>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Book</th>
+                <th>Issue Date</th>
+                <th>Due Date</th>
+                <th>Fine (₹)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="mdBooksBody">
+              <tr>
+                <td colspan="5" class="text-muted text-center">
+                  Select a member
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ================= ADD MEMBER MODAL ================= -->
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addStudentForm">
+          <div class="mb-3">
+            <label class="form-label">Member ID</label>
+            <input name="id" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" required>
+          </div>
+          <button class="btn btn-success w-100">Add Member</button>
+          <div id="studentFormMsg" class="text-center small mt-2"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:replace="~{layout :: scripts}"></script>
+<script src="/js/students.js"></script>
+</body>
+</html>
